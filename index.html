@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Dramatic Pigeon Translator 🕊️🥖</title>
+  <meta name="description" content="Confess your life choices to a cynical street pigeon on a park bench. Watch it judge you with synthesized raspy coos, aggressive head bobbing, and dramatic subtitles about crumb economics.">
+
+  <!-- Custom inline SVG Favicon: street pigeon with iridescent neck and tiny breadcrumb -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231e2430'/%3E%3Cpath d='M18 48 C 18 36, 26 26, 38 26 C 46 26, 52 32, 52 40 C 52 48, 44 54, 32 54 L18 54 Z' fill='%23707b8b'/%3E%3Cellipse cx='40' cy='22' rx='12' ry='11' fill='%23545e6d'/%3E%3Cpath d='M36 24 C 36 20, 44 20, 48 24 C 44 28, 36 28, 36 24' fill='%237b42f6' opacity='0.85'/%3E%3Cpath d='M48 21 L58 24 L48 27 Z' fill='%23f59e0b'/%3E%3Ccircle cx='43' cy='18' r='3.5' fill='%23ea580c'/%3E%3Ccircle cx='43' cy='18' r='1.8' fill='%230f172a'/%3E%3Ccircle cx='44' cy='17' r='0.8' fill='%23ffffff'/%3E%3Crect x='56' y='32' width='5' height='4' rx='1.5' fill='%23fef08a' transform='rotate(15 56 32)'/%3E%3C/svg%3E">
+
+  <link rel="stylesheet" href="style.css">
+  <!-- canvas-confetti for crumb frenzy and dramatic judgments -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+  <!-- Fullscreen Park Atmosphere & Ambient Glow -->
+  <div class="park-sky">
+    <div class="stars-layer"></div>
+    <div class="city-skyline"></div>
+    <div class="park-trees"></div>
+    <div class="lamp-glow"></div>
+  </div>
+
+  <!-- Falling leaves canvas -->
+  <canvas id="leaves-canvas" class="leaves-canvas"></canvas>
+
+  <!-- Main App Shell -->
+  <div class="app-container">
+
+    <!-- Top Navigation HUD -->
+    <header class="hud-header">
+      <div class="hud-brand">
+        <span class="hud-icon">🕊️</span>
+        <div class="hud-title-group">
+          <h1 class="hud-title">THE DRAMATIC PIGEON TRANSLATOR</h1>
+          <span class="hud-subtitle">DEPARTMENT OF PARK BENCH CONSULTING & CRUMB VALUATION</span>
+        </div>
+      </div>
+
+      <div class="hud-actions">
+        <div class="stat-pill" title="Total breadcrumbs digested today">
+          <span class="stat-label">CRUMBS EATEN:</span>
+          <span id="crumbs-eaten-counter" class="stat-value">0</span>
+        </div>
+        <button id="btn-sound" class="hud-btn" title="Toggle Synthesized Avian Audio (Key: M)">
+          🔊 <span id="sound-label">Audio ON</span>
+        </button>
+        <button id="btn-toss-crumb-hud" class="hud-btn hud-btn-accent" title="Toss a Fresh Sourdough Crumb (Key: Space)">
+          🥖 <span>Toss Crumb</span>
+        </button>
+        <button id="btn-dossier" class="hud-btn" title="View Pigeon Dossier & Crumb Exchange Rates">
+          📜 <span>Dossier</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Interactive Theater Stage -->
+    <main class="theater-stage">
+
+      <!-- Breadcrumbs Physics Canvas -->
+      <canvas id="crumb-canvas" class="crumb-canvas"></canvas>
+
+      <!-- Street Lamp with Flickering Amber Warmth -->
+      <div class="street-lamp">
+        <div class="lamp-post"></div>
+        <div class="lamp-arm"></div>
+        <div class="lamp-lantern">
+          <div class="lamp-bulb"></div>
+          <div class="lamp-cone"></div>
+        </div>
+      </div>
+
+      <!-- Park Bench Setup -->
+      <div class="bench-container" id="bench-container">
+        <!-- Bench Backrest -->
+        <div class="bench-backrest">
+          <div class="slat slat-1"></div>
+          <div class="slat slat-2"></div>
+          <div class="slat slat-3"></div>
+          <!-- Memorial Plaque Easter Egg -->
+          <button id="memorial-plaque" class="memorial-plaque" title="Click to read park bench memorial plaque">
+            <span class="plaque-text">★ In Eternal Honor of an Entire Sourdough Bagel Dropped Here, 2021 ★</span>
+          </button>
+        </div>
+
+        <!-- Bench Seat Surface (Walkable Area) -->
+        <div class="bench-seat" id="bench-seat">
+          <div class="seat-slat"></div>
+          <div class="seat-slat"></div>
+          <div class="seat-slat"></div>
+        </div>
+
+        <!-- Bench Legs & Iron Supports -->
+        <div class="bench-leg bench-leg-left"></div>
+        <div class="bench-leg bench-leg-right"></div>
+
+        <!-- The Sovereign Pigeon (Vector SVG Character) -->
+        <div id="pigeon-actor" class="pigeon-actor" role="button" tabindex="0" title="Click or tap Barnaby to startle or inspect him">
+          <!-- Speech Bubble / Thought Cue -->
+          <div id="pigeon-mood-bubble" class="pigeon-mood-bubble">
+            <span id="pigeon-mood-emoji">🥖</span>
+            <span id="pigeon-mood-text">Judging...</span>
+          </div>
+
+          <!-- SVG Graphic of Street Pigeon with Articulated Limbs -->
+          <svg id="pigeon-svg" viewBox="0 0 200 220" class="pigeon-svg" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="iridescent-neck" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#10b981" />
+                <stop offset="45%" stop-color="#3b82f6" />
+                <stop offset="75%" stop-color="#8b5cf6" />
+                <stop offset="100%" stop-color="#ec4899" />
+              </linearGradient>
+              <linearGradient id="pigeon-body-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#64748b" />
+                <stop offset="70%" stop-color="#475569" />
+                <stop offset="100%" stop-color="#334155" />
+              </linearGradient>
+              <linearGradient id="wing-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#475569" />
+                <stop offset="50%" stop-color="#334155" />
+                <stop offset="100%" stop-color="#1e293b" />
+              </linearGradient>
+              <filter id="pigeon-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="rgba(0,0,0,0.4)" />
+              </filter>
+            </defs>
+
+            <!-- Shadow underneath feet -->
+            <ellipse cx="100" cy="208" rx="45" ry="8" fill="rgba(0,0,0,0.35)" />
+
+            <!-- Legs & Claws -->
+            <g id="pigeon-legs" class="pigeon-legs">
+              <!-- Left Leg -->
+              <g id="leg-left" class="pigeon-leg">
+                <path d="M85 175 L82 195 L72 204 M82 195 L84 206 M82 195 L93 203" stroke="#ea580c" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+              </g>
+              <!-- Right Leg -->
+              <g id="leg-right" class="pigeon-leg">
+                <path d="M115 175 L118 195 L108 204 M118 195 L120 206 M118 195 L129 203" stroke="#ea580c" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+              </g>
+            </g>
+
+            <!-- Tail Feathers -->
+            <g id="pigeon-tail" class="pigeon-tail">
+              <path d="M35 150 L5 175 L15 190 L55 168 Z" fill="#1e293b" />
+              <path d="M42 153 L10 182 L22 194 L62 170 Z" fill="#0f172a" />
+              <!-- White stripe on street pigeon tail -->
+              <path d="M14 180 L22 188 L30 183 L20 174 Z" fill="#94a3b8" />
+            </g>
+
+            <!-- Plump Body -->
+            <g id="pigeon-torso" class="pigeon-torso">
+              <path d="M48 140 C 45 105, 75 90, 110 95 C 145 100, 160 130, 150 160 C 140 182, 100 185, 70 180 C 50 175, 48 155, 48 140 Z" fill="url(#pigeon-body-grad)" filter="url(#pigeon-shadow)" />
+            </g>
+
+            <!-- Folded Wing with Wing Bars -->
+            <g id="pigeon-wing" class="pigeon-wing">
+              <path d="M60 120 C 70 100, 120 105, 140 130 C 148 142, 140 168, 110 172 C 80 175, 55 155, 60 120 Z" fill="url(#wing-grad)" />
+              <!-- Classic black twin wing-bars -->
+              <path d="M80 130 C 95 132, 120 145, 126 156" stroke="#0f172a" stroke-width="5" stroke-linecap="round" fill="none" />
+              <path d="M72 142 C 90 146, 110 156, 116 166" stroke="#0f172a" stroke-width="5" stroke-linecap="round" fill="none" />
+            </g>
+
+            <!-- Articulated Neck & Head Group (rotates & bobs) -->
+            <g id="pigeon-head-group" class="pigeon-head-group">
+              <!-- Iridescent Neck -->
+              <path id="pigeon-neck" d="M102 96 C 105 75, 118 60, 138 55 C 152 70, 155 88, 144 110 C 132 108, 115 105, 102 96 Z" fill="url(#iridescent-neck)" />
+              
+              <!-- Head Ball -->
+              <ellipse cx="146" cy="50" rx="22" ry="19" fill="#545e6d" />
+
+              <!-- Eye Ring & Eye -->
+              <circle cx="152" cy="45" r="7.5" fill="#ea580c" />
+              <circle cx="152" cy="45" r="4.5" fill="#fbbf24" />
+              <!-- Eye Pupil (moves with cursor) -->
+              <circle id="pigeon-pupil" cx="152" cy="45" r="2.6" fill="#090d16" />
+              <circle cx="154" cy="43" r="1.1" fill="#ffffff" />
+
+              <!-- Upper Beak & Cere (White wattle above beak) -->
+              <path d="M158 48 C 160 44, 166 45, 167 48 Z" fill="#e2e8f0" />
+              <g id="beak-upper">
+                <path d="M164 48 L188 53 L164 57 Z" fill="#f59e0b" />
+              </g>
+              <!-- Lower Beak (drops open when cooing) -->
+              <g id="beak-lower" class="beak-lower">
+                <path d="M164 56 L186 54 L164 61 Z" fill="#d97706" />
+              </g>
+            </g>
+          </svg>
+        </div>
+
+      </div>
+
+      <!-- Bench Interaction Banner / Instructions Hint -->
+      <div class="stage-hint">
+        <span>💡 Click bench to drop crumbs • Click Barnaby to provoke wisdom • Space to toss</span>
+      </div>
+
+    </main>
+
+    <!-- Subtitle Broadcast & Translation Theatre -->
+    <section class="translation-screen" id="translation-screen">
+      <div class="translation-letterbox">
+        <div class="screen-header">
+          <div class="live-indicator">
+            <span class="pulsing-dot"></span>
+            <span class="indicator-text">COORLEONE SATELLITE TRANSLATION FEED</span>
+          </div>
+          <div class="audio-waveform-mini" id="mini-waveform">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+
+        <!-- The Subtitles (Typewriter Animated) -->
+        <div class="subtitles-container">
+          <div class="subtitle-quote-mark">“</div>
+          <div id="subtitles-text" class="subtitles-text">
+            Hoo-hoo... coo-ROOO! (Translation: "Approach the bench, fragile biped. Confess thy ridiculous human tribulations, and I shall evaluate them according to the sacred law of the Sourdough.")
+          </div>
+          <div class="subtitle-quote-mark">”</div>
+        </div>
+
+        <!-- Economic Breakdown & Tactical Verdict -->
+        <div id="verdict-card" class="verdict-card">
+          <div class="verdict-metric metric-value">
+            <span class="metric-label">CRUMB VALUATION:</span>
+            <span id="crumb-valuation-val" class="metric-highlight">0.05 Stale Saltines</span>
+          </div>
+          <div class="verdict-metric metric-status">
+            <span class="metric-label">PARK BENCH VERDICT:</span>
+            <span id="bench-verdict-val" class="metric-highlight">Irresponsible Featherless Conduct</span>
+          </div>
+          <div class="verdict-metric metric-action">
+            <span class="metric-label">PIGEON DIRECTIVE:</span>
+            <span id="pigeon-directive-val" class="metric-highlight">Poop strategically on biped's windshield</span>
+          </div>
+        </div>
+
+        <!-- Action tools for the translation -->
+        <div class="translation-footer">
+          <button id="btn-copy-verdict" class="btn-copy" title="Copy Pigeon Translation to Clipboard">
+            📋 <span>Copy Avian Decree</span>
+          </button>
+          <button id="btn-re-coo" class="btn-copy" title="Make Pigeon Coo This Again">
+            🔄 <span>Re-Coo</span>
+          </button>
+          <span id="copy-toast" class="copy-toast">Copied to Clipboard! 🍞</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Input Control Deck -->
+    <section class="control-deck">
+      <form id="confession-form" class="confession-form">
+        <!-- Translation Mode Switcher -->
+        <div class="mode-selector">
+          <span class="mode-label">TRANSLATION PHILOSOPHY:</span>
+          <div class="mode-options">
+            <label class="mode-pill active" title="Evaluates all problems through caloric bread values">
+              <input type="radio" name="pigeon-mode" value="economics" checked>
+              <span>🍞 Crumb Economics</span>
+            </label>
+            <label class="mode-pill" title="Philosophical contempt for bipedal complications">
+              <input type="radio" name="pigeon-mode" value="existential">
+              <span>⚖️ Existential Disdain</span>
+            </label>
+            <label class="mode-pill" title="Geopolitical avian warfare and statue coordinates">
+              <input type="radio" name="pigeon-mode" value="warfare">
+              <span>🏛️ Statue Defacement</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Input Box -->
+        <div class="input-row">
+          <div class="input-wrapper">
+            <input 
+              type="text" 
+              id="confession-input" 
+              class="confession-input" 
+              placeholder="Confess a life dilemma (e.g. 'Should I reply to my boss on Sunday?')" 
+              autocomplete="off"
+              maxlength="160"
+            />
+            <button type="button" id="btn-clear-input" class="btn-clear-input" title="Clear input">×</button>
+          </div>
+          <button type="submit" id="btn-submit" class="btn-submit">
+            <span>TRANSLATE & JUDGE</span>
+            <span class="btn-sub-arrow">🕊️</span>
+          </button>
+        </div>
+
+        <!-- Quick Suggestions Chips -->
+        <div class="quick-chips-wrapper">
+          <span class="chips-label">Popular Dilemmas:</span>
+          <div class="quick-chips">
+            <button type="button" class="chip-btn" data-text="Should I quit my job to sculpt artisanal goat cheese?">🧀 Artisanal Cheese Career</button>
+            <button type="button" class="chip-btn" data-text="I bought an $8 iced oat vanilla matcha latte again.">🍵 $8 Matcha Latte</button>
+            <button type="button" class="chip-btn" data-text="I said 'You too!' when the airline gate agent told me to have a nice flight.">✈️ Gate Agent Faux Pas</button>
+            <button type="button" class="chip-btn" data-text="Should I text my ex back after three pints of craft lager?">📱 Midnight Ex Text</button>
+            <button type="button" class="chip-btn" data-text="I bought running shoes 6 months ago and have only used them to retrieve Deliveroo.">👟 Virgin Running Shoes</button>
+            <button type="button" id="btn-random-chip" class="chip-btn chip-random">🎲 Surprise the Bird</button>
+          </div>
+        </div>
+
+      </form>
+    </section>
+
+  </div>
+
+  <!-- Dossier Modal (Easter Egg / Info) -->
+  <div id="dossier-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="dossier-mugshot">
+          <div class="mugshot-pigeon">🕊️</div>
+          <div class="mugshot-tag">SUBJECT #8942-B</div>
+        </div>
+        <div class="dossier-details">
+          <h2>BARNABY "THE SOURDOUGH" COORLEONE</h2>
+          <p>Senior Fellow of Urban Park Bench Economics & Statue Defacement Tactics</p>
+        </div>
+        <button id="btn-close-dossier" class="btn-close-modal">×</button>
+      </div>
+
+      <div class="modal-body">
+        <h3>Official Crumb Exchange Rate (S&P 500 Park Index)</h3>
+        <table class="rate-table">
+          <thead>
+            <tr>
+              <th>Human Currency / Asset</th>
+              <th>Avian Fair Market Equivalent</th>
+              <th>Stability Rating</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>$1.00 USD / €1.00 EUR</td>
+              <td>0.08 French Baguette Flake</td>
+              <td>Volatile (Rain dissolves it)</td>
+            </tr>
+            <tr>
+              <td>1 Hour of Corporate Overtime</td>
+              <td>Half a Sesame Pretzel Nibble</td>
+              <td>Extremely Poor ROI</td>
+            </tr>
+            <tr>
+              <td>A Masters Degree in Fine Arts</td>
+              <td>1 Empty Chip Packet (Discarded)</td>
+              <td>Good shelter in gale winds</td>
+            </tr>
+            <tr>
+              <td>One Golden Brioche Crust</td>
+              <td>Imperial Sovereign Status</td>
+              <td>Priceless Avian Wonder</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Pigeon Etiquette Rules</h3>
+        <ul class="dossier-rules">
+          <li><strong>Rule 1:</strong> Do not touch the feathers unless holding a toasted bagel.</li>
+          <li><strong>Rule 2:</strong> Seagulls are uncultured barbarians; do not mention them in Barnaby's presence.</li>
+          <li><strong>Rule 3:</strong> Municipal statues of historical figures are merely perches with drainage systems.</li>
+        </ul>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-feed-bribe" class="btn-bribe">🥖 Bribe Barnaby with 5 Crumbs</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Memorial Plaque Modal -->
+  <div id="plaque-modal" class="modal-backdrop">
+    <div class="modal-card plaque-card">
+      <div class="modal-header">
+        <h2>🏛️ PARK BENCH #44 BRASS MEMORIAL</h2>
+        <button id="btn-close-plaque" class="btn-close-modal">×</button>
+      </div>
+      <div class="modal-body plaque-modal-body">
+        <p class="plaque-quote">"On October 14th, 2021 at 12:47 PM, a distracted investment banker dropped an entire toasted everything bagel cream-cheese side down onto this exact wooden slat."</p>
+        <p class="plaque-aftermath">Over 400 pigeons, 12 sparrows, and 1 rogue raccoon attended the ensuing feast. It remains the highest recorded caloric yield event in municipal bench history.</p>
+        <div class="plaque-footer-stamp">— Certified by the Central Park Pigeon Guild</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+
+<script>window.__BORED_AI_SLUG__="pigeon-translator";</script>
+<script src="report-widget.js"></script>
+</body>
+</html>
